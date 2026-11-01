@@ -1,10 +1,10 @@
-partition_number,filename,assigned_to,size_bytes,sha256_hash,status
-1,drug-label-0001-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
-2,drug-label-0002-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
-3,drug-label-0003-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
-4,drug-label-0004-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
-5,drug-label-0005-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
-6,drug-label-0006-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
-7,drug-label-0007-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
-8,drug-label-0008-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
-9,drug-label-0009-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
+﻿partition_number,filename,assigned_to,size_bytes,sha256_hash,status
+1,drug-label-0001-of-0013.json.zip,Ganavi (covered by Disha),134178583,71b08f69df27f9aab377da03a624979235454f6ae69b68029bad60b7d2daf08b,DOWNLOADED
+2,drug-label-0002-of-0013.json.zip,Ganavi (covered by Disha),150774035,792fde01a5282a8476eeafb33f64909e0306e0dcc1fd96ae521835aa8c534303,DOWNLOADED
+3,drug-label-0003-of-0013.json.zip,Ganavi (covered by Disha),144817564,98b31dfb055dacc377c71da3186f4ab7f1719519128c98609ec816dec4ee41d8,DOWNLOADED
+4,drug-label-0004-of-0013.json.zip,Ganavi (covered by Disha),144358227,21e90e4c13f7c923a9ae42840b5cf4e5e68303c41dda2e65abb4a1bb94a74d4f,DOWNLOADED
+5,drug-label-0005-of-0013.json.zip,Ganavi (covered by Disha),129219425,2019039b12e6a43416b7c1ea33902c92e588dbddc001ea8036d02dfe5a7b6fba,DOWNLOADED
+6,drug-label-0006-of-0013.json.zip,Disha,139955080,d3c41729ce09939ba5f6b43674af1db52ffe385f673a7f21989d75d31e77644d,DOWNLOADED
+7,drug-label-0007-of-0013.json.zip,Disha,153193124,e6a7e1e4bb12aca572eefc547a46c583145cb3946631546eb1d988f60232612b,DOWNLOADED
+8,drug-label-0008-of-0013.json.zip,Disha,139985019,ccf40fa4c65b9edf5afbda00d95f0e90e887fa54f20585ec60e3b7eb0c9ddcd1,DOWNLOADED
+9,drug-label-0009-of-0013.json.zip,Disha,132664703,5f8456458df44b47a5149e43073d8fb0747caf30e3003bada24a49cb92e95495,DOWNLOADED

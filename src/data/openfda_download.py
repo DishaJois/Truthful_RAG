@@ -2,6 +2,7 @@ import argparse
 import hashlib
 import json
 import os
+import ssl
 import urllib.request
 from typing import List
 
@@ -24,11 +25,24 @@ def download_partition(partition_num: int, out_dir: str):
         print(f"[{filename}] Already exists. Skipping download.")
     else:
         print(f"Downloading {url} ...")
+        ctx = ssl._create_unverified_context()
         try:
-            urllib.request.urlretrieve(url, target_path)
+            req = urllib.request.Request(
+                url, 
+                headers={'User-Agent': 'Mozilla/5.0'}
+            )
+            with urllib.request.urlopen(req, context=ctx) as response, open(target_path, 'wb') as out_file:
+                chunk_size = 1024 * 1024
+                while True:
+                    data = response.read(chunk_size)
+                    if not data:
+                        break
+                    out_file.write(data)
             print(f"Downloaded {filename}.")
         except Exception as e:
             print(f"Failed to download {filename}: {e}")
+            if os.path.exists(target_path):
+                os.remove(target_path)
             return
 
     size_bytes = os.path.getsize(target_path)
@@ -37,7 +51,7 @@ def download_partition(partition_num: int, out_dir: str):
 
 def main():
     parser = argparse.ArgumentParser(description="Download openFDA partition files.")
-    parser.add_argument("--files", nargs="+", type=int, required=True, help="Partition indices (e.g., 1 2 3 4 5 6 7 8 9)")
+    parser.add_argument("--files", nargs="+", type=int, required=True, help="Partition indices")
     parser.add_argument("--out-dir", type=str, default="data/raw/openfda/", help="Directory to save raw ZIPs")
     args = parser.parse_args()
 

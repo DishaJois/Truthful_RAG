@@ -1,0 +1,31 @@
+claim_id,claim,label,source_doc,chunk_id,review_status
+cg_001,Co-administration of aspirin and warfarin increases the risk of bleeding.,SUPPORTED,openFDA:set_id_01:drug_interactions,ofd_000001,VERIFIED
+cg_002,Simvastatin exposure increases when administered concurrently with clarithromycin.,SUPPORTED,openFDA:set_id_02:drug_interactions,ofd_000002,VERIFIED
+cg_003,Ketoconazole inhibits the clearance of alprazolam.,SUPPORTED,openFDA:set_id_03:drug_interactions,ofd_000003,VERIFIED
+cg_004,Ibuprofen and lithium co-administration increases serum lithium concentrations.,SUPPORTED,openFDA:set_id_04:drug_interactions,ofd_000004,VERIFIED
+cg_005,Ciprofloxacin increases the serum concentrations of theophylline.,SUPPORTED,openFDA:set_id_05:drug_interactions,ofd_000005,VERIFIED
+cg_006,Fluoxetine combined with phenelzine increases the risk of serotonin syndrome.,SUPPORTED,DDInter:category_A.csv:row_12,dd_000001,VERIFIED
+cg_007,Rifampin decreases serum concentrations of oral contraceptives.,SUPPORTED,openFDA:set_id_06:drug_interactions,ofd_000006,VERIFIED
+cg_008,Aspirin co-administration with warfarin does not alter bleeding risk.,CONTRADICTED,openFDA:set_id_01:drug_interactions,ofd_000001,VERIFIED
+cg_009,Simvastatin plasma levels are completely unaffected by clarithromycin.,CONTRADICTED,openFDA:set_id_02:drug_interactions,ofd_000002,VERIFIED
+cg_010,Ketoconazole accelerates the hepatic clearance of alprazolam.,CONTRADICTED,openFDA:set_id_03:drug_interactions,ofd_000003,VERIFIED
+cg_011,Ibuprofen safely reduces circulating levels of lithium in renal tubules.,CONTRADICTED,openFDA:set_id_04:drug_interactions,ofd_000004,VERIFIED
+cg_012,Ciprofloxacin therapy reliably decreases serum theophylline concentrations.,CONTRADICTED,openFDA:set_id_05:drug_interactions,ofd_000005,VERIFIED
+cg_013,Fluoxetine combined with phenelzine eliminates the incidence of serotonin syndrome.,CONTRADICTED,DDInter:category_A.csv:row_12,dd_000001,VERIFIED
+cg_014,Rifampin increases serum concentrations of oral contraceptives.,CONTRADICTED,openFDA:set_id_06:drug_interactions,ofd_000006,VERIFIED
+cg_015,Metformin interacts pharmacokinetically with lisinopril.,INSUFFICIENT_EVIDENCE,DDInter:category_B.csv:row_45,dd_000002,VERIFIED
+cg_016,Omeprazole alters the systemic bio-distribution of topical mupirocin.,INSUFFICIENT_EVIDENCE,openFDA:set_id_07:drug_interactions,ofd_000007,VERIFIED
+cg_017,Levothyroxine and hydrochlorothiazide exhibit clinically significant receptor displacement.,INSUFFICIENT_EVIDENCE,DDInter:category_B.csv:row_88,dd_000003,VERIFIED
+cg_018,Amlodipine metabolism is altered by concurrent administration of topical hydrocortisone.,INSUFFICIENT_EVIDENCE,openFDA:set_id_08:drug_interactions,ofd_000008,VERIFIED
+cg_019,Gabapentin alters the unbound plasma fraction of acetaminophen.,INSUFFICIENT_EVIDENCE,DDInter:category_B.csv:row_104,dd_000004,VERIFIED
+cg_020,Atorvastatin bioavailability increases when taken with grapefruit juice.,UNSUPPORTED,openFDA:set_id_09:drug_interactions,ofd_000009,VERIFIED
+cg_021,Clopidogrel efficacy is attenuated by concurrent omeprazole administration.,UNSUPPORTED,openFDA:set_id_10:drug_interactions,ofd_000010,VERIFIED
+cg_022,Digoxin toxicity increases when administered concurrently with amiodarone.,UNSUPPORTED,DDInter:category_C.csv:row_19,dd_000005,VERIFIED
+cg_023,Methotrexate clearance is diminished in the presence of probenecid.,UNSUPPORTED,openFDA:set_id_11:drug_interactions,ofd_000011,VERIFIED
+cg_024,Spironolactone combined with potassium supplements produces life-threatening hyperkalemia.,UNSUPPORTED,DDInter:category_C.csv:row_77,dd_000006,VERIFIED
+cg_025,Allopurinol increases the active metabolites of azathioprine.,SUPPORTED,openFDA:set_id_12:drug_interactions,ofd_000012,VERIFIED
+cg_026,Allopurinol reduces azathioprine toxicity by increasing its elimination.,CONTRADICTED,openFDA:set_id_12:drug_interactions,ofd_000012,VERIFIED
+cg_027,Metformin combined with furosemide triggers immediate metabolic clearance failure.,INSUFFICIENT_EVIDENCE,openFDA:set_id_13:drug_interactions,ofd_000013,VERIFIED
+cg_028,Diltiazem elevates circulating levels of cyclosporine.,SUPPORTED,openFDA:set_id_14:drug_interactions,ofd_000014,VERIFIED
+cg_029,Diltiazem accelerates cyclosporine breakdown and decreases its blood level.,CONTRADICTED,openFDA:set_id_14:drug_interactions,ofd_000014,VERIFIED
+cg_030,Carbamazepine interacts with penicillins via direct chemical binding.,UNSUPPORTED,DDInter:category_D.csv:row_91,dd_000007,VERIFIED

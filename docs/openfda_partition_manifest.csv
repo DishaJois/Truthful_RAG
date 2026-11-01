@@ -1,0 +1,10 @@
+partition_number,filename,assigned_to,size_bytes,sha256_hash,status
+1,drug-label-0001-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
+2,drug-label-0002-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
+3,drug-label-0003-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
+4,drug-label-0004-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
+5,drug-label-0005-of-0013.json.zip,Ganavi (covered by Disha),PENDING,PENDING,PENDING_DOWNLOAD
+6,drug-label-0006-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
+7,drug-label-0007-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
+8,drug-label-0008-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD
+9,drug-label-0009-of-0013.json.zip,Disha,PENDING,PENDING,PENDING_DOWNLOAD

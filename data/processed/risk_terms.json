@@ -1,0 +1,29 @@
+{
+  "high_risk": [
+    "fatal",
+    "death",
+    "contraindicated",
+    "life-threatening",
+    "cardiac arrest",
+    "anaphylaxis",
+    "torsades de pointes",
+    "qt prolongation",
+    "severe hemorrhage",
+    "respiratory depression",
+    "coma",
+    "serotonin syndrome"
+  ],
+  "medium_risk": [
+    "monitor",
+    "caution",
+    "dose adjustment",
+    "increased levels",
+    "decreased clearance",
+    "hypotension",
+    "bleeding risk",
+    "sedation",
+    "hepatotoxicity",
+    "renal impairment",
+    "concomitant use"
+  ]
+}

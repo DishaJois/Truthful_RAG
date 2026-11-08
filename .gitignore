@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/raw/
+data/intermediate/
+data/processed/*.index
+data/processed/chunks.jsonl
+data/processed/chunks_dd.jsonl
+data/processed/openfda_*.jsonl
+data/processed/chunk_ids.json
+data/kg/triples_clean.csv
+data/kg/graph.pkl
+results/llm_cache.sqlite
+*.zip

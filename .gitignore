@@ -1,0 +1,27 @@
+# Raw datasets
+data/raw/
+
+# Generated intermediate files
+data/intermediate/
+
+# Generated processed data
+data/processed/*
+!data/processed/risk_terms.json
+
+# Embeddings and vector indexes
+data/emb/
+data/index/
+*.index
+
+# Python cache files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Editor files
+.vscode/
+.idea/

@@ -25,3 +25,14 @@ venv/
 # Editor files
 .vscode/
 .idea/
+
+# Ganavi's local OpenFDA test outputs
+data/processed/intermediate_openfda_ganavi.jsonl
+data/processed/test_ganavi_*.jsonl
+data/processed/test_ganavi_*.csv
+
+# Local generated dictionaries and temporary outputs
+data/processed/drugs_of.json
+
+# Local pipeline cache
+sudha/truthfulrag_project/truthfulrag/results/

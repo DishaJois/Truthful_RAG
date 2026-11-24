@@ -1,0 +1,13 @@
+term,decision,reason
+serum,REMOVE_CANDIDATE,Ordinary medical term
+lead,REMOVE_CANDIDATE,Element; not a standalone drug name
+alcohol,REVIEW,May refer to ethanol or a general substance
+sodium,REVIEW,Element; valid in compound ingredient names
+metabolism,REMOVE_CANDIDATE,Biological process
+health,REMOVE_CANDIDATE,General medical term
+diarrhea,REMOVE_CANDIDATE,Medical condition
+headache,REMOVE_CANDIDATE,Medical symptom
+water,REMOVE_CANDIDATE,General substance
+calcium,REVIEW,Can occur in valid medicinal compounds
+potassium,REVIEW,Can occur in valid medicinal compounds
+treat,REMOVE_CANDIDATE,Ordinary verb

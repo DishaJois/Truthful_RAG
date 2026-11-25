@@ -36,3 +36,6 @@ data/processed/drugs_of.json
 
 # Local pipeline cache
 sudha/truthfulrag_project/truthfulrag/results/
+
+# Generated knowledge-graph cache
+data/kg/*.pkl

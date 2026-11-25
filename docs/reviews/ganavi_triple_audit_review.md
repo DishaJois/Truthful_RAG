@@ -1,32 +1,41 @@
-# Review Record: Ganavi 50-Triple Precision Audit
+# Review Record: Ganavi Triple Precision Audit
 
-- **Artifact**: `triples_of_ganavi.csv` (50-sample stratified audit)
-- **Producer / Commit**: Ganavi / `<commit-hash>`
+- **Artifact**: `data/kg/triples.csv`
+- **Labeling sample**: `data/kg/sample_to_label.csv`
+- **Producer**: Ganavi
 - **Reviewer**: Disha
-- **Sample Size**: 50 triples
-- **Sampling Method**: Stratified by relation type across openFDA partitions 1–5
+- **Sample size**: 50 triples
+- **Sampling method**: Seeded sample across the available built CSV
 
-## Checks Performed
-1. Validated subject entity matches primary drug of the openFDA label.
-2. Validated object entity is an interacting co-occurring drug in the exact source sentence.
-3. Verified relation cue phrase and ensured negation cues (e.g., "does not increase") are not misclassified.
-4. Verified chunk ID resolves and follows canonical format.
+## Audit status
+
+The source passages and labeled rows are required to determine precision. This file does
+not publish invented precision numbers.
+
+The current repository build has the following evidence:
+
+- The final openFDA partitions 1-9 triple file was not present on this branch.
+- A checked-in Ganavi test artifact was used as the build fallback:
+  `data/processed/test_ganavi_clean_triples.csv`.
+- That artifact contains `interacts_with` triples and resolves against
+  `data/processed/test_ganavi_clean_chunks.jsonl`.
+
+## Commands
+
+```powershell
+python -m src.kg.build_kg
+python -m src.kg.kg_filter
+python -m src.kg.show_sample
+```
 
 ## Results
-- **Correct**: TBD / 50
-- **Incorrect**: TBD / 50
-- **Per-Relation Precision**:
-  - `contraindicated_with`: TBD
-  - `increases_effect_of`: TBD
-  - `decreases_effect_of`: TBD
-  - `interacts_with`: TBD
 
-## Disagreements & Observations
-- *None recorded yet (pending Ganavi's published audit sample).*
+- **Correct**: TBD, pending source-passage labels
+- **Incorrect**: TBD, pending source-passage labels
+- **Per-relation precision**: TBD
+- **Overall precision**: TBD
 
-## Required Fixes
-- *TBD*
+## Required fixes
 
-## Disposition
-- **Status**: PENDING REVIEW (Awaiting sample from Ganavi)
-- **Date**: 2026-11-01
+Sudarshan must provide the finalized held-out aliases before alias coverage can be
+completed. Disha must review the labeled 50-row sample.

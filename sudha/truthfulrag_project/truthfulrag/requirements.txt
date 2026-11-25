@@ -1,0 +1,10 @@
+rapidfuzz
+rank_bm25
+matplotlib
+sentence-transformers
+faiss-cpu
+ollama
+streamlit
+pandas
+numpy
+pytest

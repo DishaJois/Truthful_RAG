@@ -1,0 +1,1 @@
+{"qid": "q001", "question": "Can warfarin be taken with aspirin?", "gold_answer": "Concomitant use increases the risk of bleeding.", "gold_chunk_ids": ["c001"], "type": "answerable", "split": "tune"}\n{"qid": "q031", "question": "Does zyxolamab interact with warfarin?", "gold_answer": "", "gold_chunk_ids": [], "type": "unanswerable", "split": "tune"}\n

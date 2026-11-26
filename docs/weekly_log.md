@@ -9,3 +9,4 @@
 | 2026-11-26 | `python -m pytest -q tests/test_heldout_aliases.py tests/test_ganavi_kg.py` | 5 tests passed; checked alias and phrase filtering | test runner output |
 | 2026-11-26 | `python src/data/openfda_process.py --tag-intermediate ...` | Reprocessed partitions 1-5 with finalized held-out names: 63993 chunks, 201613 triples; 14593 primary/tag removals | local processed outputs |
 | 2026-11-26 | `python -m src.kg.build_kg` and `python -m src.kg.kg_filter` | Built from Ganavi partitions 1-5 and wrote 100000 triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-26 | Question-set contribution | Added 27 questions (13 answerable, 7 unanswerable, 7 tricky), grounded in processed Ganavi chunk IDs | `data/eval/q_ganavi.jsonl` |

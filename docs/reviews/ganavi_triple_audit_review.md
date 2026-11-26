@@ -15,10 +15,12 @@ not publish invented precision numbers.
 The current repository build has the following evidence:
 
 - The final openFDA partitions 1-9 triple file was not present on this branch.
-- A checked-in Ganavi test artifact was used as the build fallback:
-  `data/processed/test_ganavi_clean_triples.csv`.
-- That artifact contains `interacts_with` triples and resolves against
-  `data/processed/test_ganavi_clean_chunks.jsonl`.
+- Ganavi's partitions 1-5 intermediate corpus is available locally; when processed,
+  it is preferred over the smaller checked-in test fixture.
+- The test fixture fallback is `data/processed/test_ganavi_clean_triples.csv`,
+  resolved against `data/processed/test_ganavi_clean_chunks.jsonl`.
+- The build excludes all canonical held-out names and aliases from both entity
+  fields and source passage text. The finalized reference was supplied by Sudarshan.
 
 ## Commands
 
@@ -35,7 +37,8 @@ python -m src.kg.show_sample
 - **Per-relation precision**: TBD
 - **Overall precision**: TBD
 
-## Required fixes
+## Remaining work
 
-Sudarshan must provide the finalized held-out aliases before alias coverage can be
-completed. Disha must review the labeled 50-row sample.
+The finalized held-out names and aliases are now recorded in
+`docs/heldout_drugs.txt` and `docs/heldout_drug_aliases.txt`. Disha must review the
+labeled 50-row sample and enter the human judgments before precision can be reported.

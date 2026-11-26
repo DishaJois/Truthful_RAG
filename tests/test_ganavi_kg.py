@@ -4,16 +4,9 @@ import os
 
 def test_filtered_triples_file_exists_and_resolves():
     triples = "data/kg/triples.csv"
-    chunks = "data/processed/test_ganavi_clean_chunks.jsonl"
     assert os.path.exists(triples)
-    assert os.path.exists(chunks)
-
-    chunk_ids = set()
-    with open(chunks, encoding="utf-8-sig") as handle:
-        import json
-        for line in handle:
-            if line.strip():
-                chunk_ids.add(json.loads(line)["chunk_id"])
+    from src.kg.build_kg import load_chunks
+    chunk_ids = set(load_chunks())
 
     with open(triples, encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))

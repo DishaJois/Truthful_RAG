@@ -1,1 +1,22 @@
-{}
+{
+  "acetaminophen": ["paracetamol", "Tylenol", "Panadol", "Calpol", "FeverAll"],
+  "amoxicillin": ["Amoxil", "Trimox", "Moxatag"],
+  "atorvastatin": ["Lipitor", "Sortis", "Atorva"],
+  "metformin": ["Glucophage", "Glumetza", "Fortamet", "Riomet"],
+  "lisinopril": ["Prinivil", "Zestril", "Qbrelis"],
+  "amlodipine": ["Norvasc", "Istin", "Katerzia"],
+  "omeprazole": ["Prilosec", "Losec", "Omez"],
+  "levothyroxine": ["Synthroid", "Levoxyl", "Tirosint", "Euthyrox", "Eltroxin"],
+  "albuterol": ["salbutamol", "Ventolin", "ProAir", "Proventil", "Asthalin"],
+  "sertraline": ["Zoloft", "Lustral"],
+  "gabapentin": ["Neurontin", "Gralise"],
+  "metoprolol": ["Lopressor", "Toprol-XL", "Toprol XL", "Betaloc"],
+  "losartan": ["Cozaar"],
+  "furosemide": ["frusemide", "Lasix", "Furoscix"],
+  "apixaban": ["Eliquis"],
+  "clopidogrel": ["Plavix", "Iscover"],
+  "ibuprofen": ["Advil", "Motrin", "Nurofen", "Brufen"],
+  "azithromycin": ["Zithromax", "Zmax", "Z-Pak", "Z Pak"],
+  "montelukast": ["Singulair"],
+  "duloxetine": ["Cymbalta", "Yentreve", "Drizalma Sprinkle"]
+}

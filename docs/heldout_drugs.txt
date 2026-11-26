@@ -1,0 +1,21 @@
+# 20 canonical generic drug names reserved for held-out evaluation.
+acetaminophen
+amoxicillin
+atorvastatin
+metformin
+lisinopril
+amlodipine
+omeprazole
+levothyroxine
+albuterol
+sertraline
+gabapentin
+metoprolol
+losartan
+furosemide
+apixaban
+clopidogrel
+ibuprofen
+azithromycin
+montelukast
+duloxetine

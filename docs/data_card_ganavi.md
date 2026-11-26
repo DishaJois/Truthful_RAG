@@ -9,9 +9,10 @@ input is `data/kg/triples.csv`.
 ## Current build artifact
 
 The repository branch does not contain `data/processed/openfda_triples_p1_9.jsonl`.
-For a reproducible local fallback, `src/kg/build_kg.py` uses
-`data/processed/test_ganavi_clean_triples.csv` and verifies chunk IDs against
-`data/processed/test_ganavi_clean_chunks.jsonl`.
+The locally available Ganavi partitions 1-5 intermediate corpus was reprocessed using
+Sudarshan's finalized held-out reference. This produced 63,993 clean chunks and
+201,613 triples in the local processed outputs. `src/kg/build_kg.py` uses those outputs
+when present, otherwise it falls back to the checked-in test artifacts.
 
 ## Processing
 
@@ -20,6 +21,10 @@ For a reproducible local fallback, `src/kg/build_kg.py` uses
 3. Remove rows whose chunk ID is absent from the available chunk corpus.
 4. Apply the relation allowlist and remove low-quality dictionary terms.
 5. Retain at most 100,000 rows for GitHub and memory constraints.
+
+The committed KG export contains 100,000 rows due to the configured cap. It was generated
+after excluding held-out entities and passages; a source triple can only be included if its
+chunk ID resolves to a processed passage.
 
 ## Measurements
 
@@ -30,5 +35,7 @@ For a reproducible local fallback, `src/kg/build_kg.py` uses
 
 ## Aliases
 
-`data/processed/aliases.json` is empty until Sudarshan publishes the finalized held-out
-drug brands and aliases.
+`docs/heldout_drugs.txt`, `docs/heldout_drug_aliases.txt`, and
+`data/processed/aliases.json` contain the finalized 20-entity set supplied by Sudarshan.
+Both canonical generic names and aliases are filtered using whole-phrase matching, so
+multi-word names and punctuation variants (for example `Toprol-XL`) are detected.

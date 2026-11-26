@@ -1,6 +1,7 @@
 import csv
 import os
 
+from src.data.openfda_process import build_term_trie, load_heldout, match_trie
 
 BAD_TERMS = {
     "serum", "lead", "metabolism", "health", "diarrhea", "headache",
@@ -13,6 +14,8 @@ ALLOWED_RELATIONS = {"interacts_with", "increases_effect_of", "decreases_effect_
 def kg_filter(source="data/kg/triples.csv", output="data/kg/triples.csv", max_rows=100000):
     if not os.path.exists(source):
         raise FileNotFoundError(f"{source} does not exist")
+    heldout = load_heldout("docs/heldout_drugs.txt", "docs/heldout_drug_aliases.txt")
+    heldout_trie = build_term_trie(heldout)
     kept = []
     counts = {}
     with open(source, encoding="utf-8-sig", newline="") as handle:
@@ -21,6 +24,8 @@ def kg_filter(source="data/kg/triples.csv", output="data/kg/triples.csv", max_ro
             subject = row["subject"].lower().strip()
             object_name = row["object"].lower().strip()
             if relation not in ALLOWED_RELATIONS:
+                continue
+            if match_trie(subject, heldout_trie) or match_trie(object_name, heldout_trie):
                 continue
             if subject in BAD_TERMS or object_name in BAD_TERMS:
                 continue

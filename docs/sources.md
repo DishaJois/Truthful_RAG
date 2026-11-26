@@ -1,5 +1,15 @@
 # Data Sources Registry
 
+## Held-Out Drug Alias Reference
+- **Source**: Canonical Generic Drugs and Brand-Name Aliases (20-entity held-out reference set)
+- **Provided By**: Sudarshan
+- **Use**: Held-out entity and text filtering; normalization evaluation
+- **Local Files**: `docs/heldout_drugs.txt`, `docs/heldout_drug_aliases.txt`,
+  `data/processed/aliases.json`
+- **Notes**: Includes alternate generic naming (acetaminophen/paracetamol,
+  albuterol/salbutamol) and specifies single-ingredient boundaries. Combination
+  products and specified stereoisomers/prodrugs are not aliases.
+
 ## openFDA Drug Labels
 - **Source**: U.S. FDA openFDA drug product labels
 - **Data APIs**: https://open.fda.org/apis/drug/label/

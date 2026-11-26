@@ -24,6 +24,35 @@ def clean_text(text: str) -> str:
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
+def build_term_trie(terms: Set[str]):
+    trie = {}
+    for term in terms:
+        term_tokens = re.findall(r"\b\w+\b", term.lower())
+        if not term_tokens:
+            continue
+        node = trie
+        for token in term_tokens:
+            node = node.setdefault(token, {})
+        node.setdefault(None, set()).add(term)
+    return trie
+
+def match_trie(text: str, trie) -> Set[str]:
+    tokens = re.findall(r"\b\w+\b", text.lower())
+    matches = set()
+    for start in range(len(tokens)):
+        node = trie
+        position = start
+        while position < len(tokens):
+            node = node.get(tokens[position])
+            if node is None:
+                break
+            matches.update(node.get(None, ()))
+            position += 1
+    return matches
+
+def find_matching_terms(text: str, terms: Set[str]) -> Set[str]:
+    return match_trie(text, build_term_trie(terms))
+
 def chunk_text(text: str, chunk_size: int = 200, overlap: int = 30) -> List[str]:
     words = text.split()
     if len(words) <= chunk_size:
@@ -38,8 +67,7 @@ def chunk_text(text: str, chunk_size: int = 200, overlap: int = 30) -> List[str]
     return chunks
 
 def contains_heldout_word(text: str, heldout_set: Set[str]) -> bool:
-    tokens = set(re.findall(r"\b\w+\b", text.lower()))
-    return bool(tokens.intersection(heldout_set))
+    return bool(find_matching_terms(text, heldout_set))
 
 # ================= PASS 1: COLLECT NAMES & UNTAGGED CHUNKS =================
 def run_pass1(files: List[int], raw_dir: str, intermediate_out: str, names_out: str, heldout_set: Set[str]):
@@ -47,6 +75,7 @@ def run_pass1(files: List[int], raw_dir: str, intermediate_out: str, names_out: 
     os.makedirs(os.path.dirname(names_out), exist_ok=True)
 
     discovered_drugs = set()
+    heldout_trie = build_term_trie(heldout_set)
     intermediate_chunks = []
     seen_hashes = set()
 
@@ -78,7 +107,7 @@ def run_pass1(files: List[int], raw_dir: str, intermediate_out: str, names_out: 
                                 discovered_drugs.add(n)
 
                         # Primary label exclusion: drop if primary generic is held out
-                        if primary_drug in heldout_set:
+                        if match_trie(primary_drug, heldout_trie):
                             continue
 
                         set_id = result.get("set_id", "unknown_set")
@@ -117,10 +146,12 @@ def run_pass1(files: List[int], raw_dir: str, intermediate_out: str, names_out: 
     print(f"Pass 1 finished: {len(intermediate_chunks)} passages saved, {len(discovered_drugs)} distinct drug names collected.")
 
 # ================= PASS 2: TAG & FILTER WITH FROZEN DICTIONARY =================
-def run_pass2(intermediate_in: str, prefix: str, drugs_file: str, aliases_file: str, chunks_out: str, triples_out: str):
+def run_pass2(intermediate_in: str, prefix: str, drugs_file: str, aliases_file: str, chunks_out: str, triples_out: str, heldout_file: str = "docs/heldout_drugs.txt"):
     with open(drugs_file, "r", encoding="utf-8") as f:
         drug_dict = set(json.load(f))
-    heldout_set = load_heldout("", aliases_file)
+    heldout_set = load_heldout(heldout_file, aliases_file)
+    heldout_trie = build_term_trie(heldout_set)
+    drug_trie = build_term_trie(drug_dict)
 
     os.makedirs(os.path.dirname(chunks_out), exist_ok=True)
     os.makedirs(os.path.dirname(triples_out), exist_ok=True)
@@ -137,20 +168,22 @@ def run_pass2(intermediate_in: str, prefix: str, drugs_file: str, aliases_file: 
             item = json.loads(line)
             text = item["text"]
             primary_drug = item["primary_drug"]
+            if match_trie(primary_drug, heldout_trie):
+                tag_removals += 1
+                continue
 
             # Tag drugs present in text
-            words_in_text = set(re.findall(r"\b\w+\b", text.lower()))
-            tagged_drugs = sorted(list(words_in_text.intersection(drug_dict)))
+            tagged_drugs = sorted(match_trie(text, drug_trie))
 
             if not tagged_drugs:
                 continue
 
             # Held-out filtering: tags and whole-word text
-            if any(d in heldout_set for d in tagged_drugs):
+            if any(match_trie(drug, heldout_trie) for drug in tagged_drugs):
                 tag_removals += 1
                 continue
 
-            if contains_heldout_word(text, heldout_set):
+            if match_trie(text, heldout_trie):
                 text_removals += 1
                 continue
 
@@ -165,7 +198,7 @@ def run_pass2(intermediate_in: str, prefix: str, drugs_file: str, aliases_file: 
 
             # Rule-based triples
             for other_drug in tagged_drugs:
-                if other_drug != primary_drug and other_drug not in heldout_set:
+                if other_drug != primary_drug and not match_trie(other_drug, heldout_trie):
                     final_triples.append({
                         "subject": primary_drug,
                         "relation": "interacts_with",
@@ -201,6 +234,7 @@ def main():
     parser.add_argument("--prefix")
     parser.add_argument("--drugs", default="data/processed/drugs_of.json")
     parser.add_argument("--heldout-aliases", default="docs/heldout_drug_aliases.txt")
+    parser.add_argument("--heldout-drugs", default="docs/heldout_drugs.txt")
     parser.add_argument("--chunks-out")
     parser.add_argument("--triples-out")
     args = parser.parse_args()
@@ -210,7 +244,7 @@ def main():
     if args.collect_names:
         run_pass1(args.files, args.raw_dir, args.intermediate_out, args.names_out, heldout_set)
     elif args.tag_intermediate:
-        run_pass2(args.intermediate_in, args.prefix, args.drugs, args.heldout_aliases, args.chunks_out, args.triples_out)
+        run_pass2(args.intermediate_in, args.prefix, args.drugs, args.heldout_aliases, args.chunks_out, args.triples_out, args.heldout_drugs)
 
 if __name__ == "__main__":
     main()

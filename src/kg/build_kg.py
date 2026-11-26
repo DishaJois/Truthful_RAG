@@ -3,26 +3,32 @@ import json
 import os
 from pathlib import Path
 
+from src.data.openfda_process import build_term_trie, load_heldout, match_trie
 
 SRC = "data/processed/openfda_triples_p1_9.jsonl"
 OUT = "data/kg/triples.csv"
-FALLBACK_CSV = "data/processed/test_ganavi_clean_triples.csv"
-CHUNKS = "data/processed/test_ganavi_clean_chunks.jsonl"
+FALLBACK_SOURCES = (
+    "data/processed/ganavi_clean_triples.csv",
+    "data/processed/test_ganavi_clean_triples.csv",
+)
+CHUNK_SOURCES = (
+    "data/processed/chunks.jsonl",
+    "data/processed/ganavi_clean_chunks.jsonl",
+    "data/processed/test_ganavi_clean_chunks.jsonl",
+)
 
 
-def load_chunk_ids():
-    for path in (
-        "data/processed/chunks.jsonl",
-        "data/processed/test_ganavi_clean_chunks.jsonl",
-    ):
+def load_chunks():
+    for path in CHUNK_SOURCES:
         if not os.path.exists(path):
             continue
-        ids = set()
+        chunks = {}
         with open(path, encoding="utf-8-sig") as handle:
             for line in handle:
                 if line.strip():
-                    ids.add(json.loads(line)["chunk_id"])
-        return ids
+                    chunk = json.loads(line)
+                    chunks[chunk["chunk_id"]] = chunk.get("text", "")
+        return chunks
     return None
 
 
@@ -43,34 +49,43 @@ def load_triples():
                     })
         return rows, str(source)
 
-    fallback = Path(FALLBACK_CSV)
-    if not fallback.exists():
-        raise FileNotFoundError(
-            f"Missing {SRC} and fallback {FALLBACK_CSV}. Download/share the source triples first."
-        )
-    with fallback.open(encoding="utf-8-sig", newline="") as handle:
-        rows = []
-        for row in csv.DictReader(handle):
-            rows.append({
-                "subject": row["subject"].lower().strip(),
-                "relation": row["relation"].lower().strip(),
-                "object": row["object"].lower().strip(),
-                "chunk_id": row["chunk_id"].strip(),
-                "source": row.get("source", "openFDA"),
-            })
-    return rows, str(fallback)
+    for fallback in FALLBACK_SOURCES:
+        path = Path(fallback)
+        if not path.exists():
+            continue
+        with path.open(encoding="utf-8-sig", newline="") as handle:
+            rows = []
+            for row in csv.DictReader(handle):
+                rows.append({
+                    "subject": row["subject"].lower().strip(),
+                    "relation": row["relation"].lower().strip(),
+                    "object": row["object"].lower().strip(),
+                    "chunk_id": row["chunk_id"].strip(),
+                    "source": row.get("source", "openFDA"),
+                })
+        return rows, str(path)
+    raise FileNotFoundError(
+        f"Missing {SRC} and fallback sources {', '.join(FALLBACK_SOURCES)}. "
+        "Run the Ganavi OpenFDA processing pipeline first."
+    )
 
 
 def build_kg():
     rows, source = load_triples()
-    valid_ids = load_chunk_ids()
+    chunks = load_chunks()
+    heldout = load_heldout("docs/heldout_drugs.txt", "docs/heldout_drug_aliases.txt")
+    heldout_trie = build_term_trie(heldout)
     seen = set()
     cleaned = []
     for row in rows:
         key = (row["subject"], row["relation"], row["object"], row["chunk_id"])
         if not all(key[:3]) or key in seen:
             continue
-        if valid_ids is not None and row["chunk_id"] not in valid_ids:
+        if chunks is not None and row["chunk_id"] not in chunks:
+            continue
+        if match_trie(row["subject"], heldout_trie) or match_trie(row["object"], heldout_trie):
+            continue
+        if chunks is not None and match_trie(chunks[row["chunk_id"]], heldout_trie):
             continue
         seen.add(key)
         cleaned.append(row)

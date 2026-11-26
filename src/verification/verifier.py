@@ -8,11 +8,11 @@ SIM_THRESHOLD = 0.25
 HIGH_RISK = ('contraindicated', 'fatal', 'avoid', 'dose', 'overdose', 'death', 'life-threatening', 'severe')
 LABELS = {'SUPPORTED', 'PARTIALLY_SUPPORTED', 'CONTRADICTED', 'CONFLICTING_EVIDENCE', 'INSUFFICIENT_EVIDENCE'}
 BASE_CONF = {
-    'SUPPORTED': 0.8,
-    'CONTRADICTED': 0.8,
-    'CONFLICTING_EVIDENCE': 0.7,
-    'PARTIALLY_SUPPORTED': 0.65,
-    'INSUFFICIENT_EVIDENCE': 0.5
+    'SUPPORTED': 0.85,
+    'CONTRADICTED': 0.85,
+    'CONFLICTING_EVIDENCE': 0.75,
+    'PARTIALLY_SUPPORTED': 0.70,
+    'INSUFFICIENT_EVIDENCE': 0.60
 }
 
 def risk_level(claim):
@@ -24,30 +24,34 @@ def _similarities(claim, evidence):
     return (vecs[1:] @ vecs[0]).tolist()
 
 def _prompt(claim, top):
-    ev = '\n\n'.join('[' + e['chunk_id'] + '] ' + e['text'][:1200] for e in top)
+    ev = '\n\n'.join(f"[{e['chunk_id']}] {e['text'][:1200]}" for e in top)
     return (
-        'You verify claims about drug interactions against evidence.\n\nEvidence:\n' + ev +
-        '\n\nClaim: ' + claim + '\n\nChoose exactly one label:\n'
-        'SUPPORTED: the evidence directly states the claim\n'
-        'PARTIALLY_SUPPORTED: the evidence covers only part of the claim\n'
-        'CONTRADICTED: the evidence states the opposite\n'
-        'CONFLICTING_EVIDENCE: different passages disagree with each other\n'
-        'INSUFFICIENT_EVIDENCE: the evidence is related but does not settle the claim\n\n'
-        'Reply with JSON only, like {"label": "SUPPORTED", "reason": "one short sentence"}'
+        "You are an expert clinical claim verifier. Compare the Claim against the Evidence.\n\n"
+        f"Evidence:\n{ev}\n\n"
+        f"Claim: {claim}\n\n"
+        "Instructions:\n"
+        "- If the evidence directly confirms the claim: SUPPORTED\n"
+        "- If the evidence directly contradicts or negates the claim: CONTRADICTED\n"
+        "- If multiple evidence passages contradict each other: CONFLICTING_EVIDENCE\n"
+        "- If only part of the claim is mentioned or details are missing: PARTIALLY_SUPPORTED\n"
+        "- If the evidence is relevant but cannot prove or disprove the claim: INSUFFICIENT_EVIDENCE\n\n"
+        "Return ONLY a valid JSON object with keys 'label' and 'reason'. Do not write explanations outside JSON.\n"
+        'Example: {"label": "SUPPORTED", "reason": "stated in passage"}'
     )
 
 def _parse(raw):
-    start, end = raw.find('{'), raw.rfind('}')
+    raw_str = raw.strip()
+    start, end = raw_str.find('{'), raw_str.rfind('}')
     if start != -1 and end > start:
         try:
-            d = json.loads(raw[start:end + 1])
+            d = json.loads(raw_str[start:end + 1])
             label = str(d.get('label', '')).strip().upper().replace(' ', '_')
             if label in LABELS:
                 return label, str(d.get('reason', ''))
         except Exception:
             pass
-    up = raw.upper()
-    for label in ('PARTIALLY_SUPPORTED', 'CONFLICTING_EVIDENCE', 'CONTRADICTED', 'INSUFFICIENT_EVIDENCE', 'SUPPORTED'):
+    up = raw_str.upper()
+    for label in ('CONFLICTING_EVIDENCE', 'PARTIALLY_SUPPORTED', 'CONTRADICTED', 'INSUFFICIENT_EVIDENCE', 'SUPPORTED'):
         if label in up:
             return label, 'parsed from free text'
     return None, ''
@@ -72,7 +76,7 @@ def verify_claim(claim, evidence, top_n=3):
     best = float(sims[order[0]])
 
     if best < SIM_THRESHOLD:
-        return _result(claim, 'UNSUPPORTED', 0.9, [], 'max similarity ' + str(round(best, 2)) + ' is below threshold', risk)
+        return _result(claim, 'UNSUPPORTED', 0.9, [], f'max similarity {round(best, 2)} is below threshold', risk)
 
     top = [evidence[i] for i in order]
     ids = [e['chunk_id'] for e in top]
@@ -83,10 +87,10 @@ def verify_claim(claim, evidence, top_n=3):
         label, reason = _parse(chat(prompt))
         if label:
             break
-        prompt += '\nRemember: reply with JSON only.'
+        prompt += '\nRespond ONLY with JSON format: {"label": "<LABEL>", "reason": "<REASON>"}'
 
     if not label:
         label, reason = 'INSUFFICIENT_EVIDENCE', 'unparseable verifier output'
 
-    conf = round(min(1.0, BASE_CONF[label] + 0.2 * (best - SIM_THRESHOLD)), 2)
+    conf = round(min(1.0, BASE_CONF.get(label, 0.6) + 0.15 * (best - SIM_THRESHOLD)), 2)
     return _result(claim, label, conf, ids, reason, risk)

@@ -1,12 +1,8 @@
-import json
+﻿import json
 import os
 import numpy as np
-
-try:
-    import faiss
-    from sentence_transformers import SentenceTransformer
-except ImportError:
-    pass
+import faiss
+from sentence_transformers import SentenceTransformer
 
 def build_faiss_index(
     merged_chunks_path: str = "data/processed/chunks.jsonl",
@@ -22,11 +18,12 @@ def build_faiss_index(
     texts = []
 
     print(f"Reading merged chunks from {merged_chunks_path}...")
-    with open(merged_chunks_path, "r", encoding="utf-8") as f:
+    with open(merged_chunks_path, "r", encoding="utf-8-sig") as f:
         for line in f:
-            if not line.strip():
+            line_str = line.strip()
+            if not line_str:
                 continue
-            item = json.loads(line)
+            item = json.loads(line_str)
             chunk_ids.append(item["chunk_id"])
             texts.append(item["text"])
 
@@ -47,7 +44,6 @@ def build_faiss_index(
     index = faiss.IndexFlatIP(dim)
     index.add(all_embs)
 
-    # Strict playbook alignment assertions
     assert index.ntotal == len(chunk_ids), "Vector count does not match chunk ID count!"
     assert len(chunk_ids) == total, "Chunk ID count does not match original chunk count!"
 

@@ -13,3 +13,5 @@ data/kg/triples_clean.csv
 data/kg/graph.pkl
 results/llm_cache.sqlite
 *.zip
+/data/
+**/__pycache__/

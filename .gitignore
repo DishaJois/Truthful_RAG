@@ -15,3 +15,5 @@ results/llm_cache.sqlite
 *.zip
 /data/
 **/__pycache__/
+
+desktop.ini

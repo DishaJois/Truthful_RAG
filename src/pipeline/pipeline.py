@@ -1,4 +1,4 @@
-import time
+﻿import time
 from src.retrieval.retriever import retrieve, get_chunk
 from src.retrieval.entities import detect_entities
 from src.kg.graph import kg_lookup
@@ -7,7 +7,7 @@ from src.verification.claims import extract_claims
 from src.verification.verifier import verify_claim
 from src.adjudication.adjudicator import adjudicate
 
-def merge_kg(evidence, edges, max_total=8):
+def merge_kg(evidence, edges, max_total=5):
     out = [dict(e) for e in evidence]
     for e in edges:
         fact = e['subject'] + ' ' + e['relation'].replace('_', ' ') + ' ' + e['object']
@@ -28,8 +28,8 @@ def run_pipeline(question, config):
     evidence = retrieve(question, k=5)
     kg_edges = []
     if config in ('B', 'D'):
-        kg_edges = kg_lookup(entities)
-        evidence = merge_kg(evidence, kg_edges)
+        kg_edges = kg_lookup(entities, max_edges=5)
+        evidence = merge_kg(evidence, kg_edges, max_total=5)
     answer = generate(question, evidence)
     claims, final, abstained = [], answer, False
     if config in ('C', 'D'):

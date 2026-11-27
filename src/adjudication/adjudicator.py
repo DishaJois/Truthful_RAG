@@ -1,3 +1,4 @@
+﻿from src.adjudication.channels import apply_channels
 KEEP = {'SUPPORTED', 'PARTIALLY_SUPPORTED'}
 BAD = {'CONFLICTING_EVIDENCE', 'INSUFFICIENT_EVIDENCE', 'UNSUPPORTED', 'AMBIGUOUS_QUERY', 'UNSAFE_TO_ANSWER'}
 DOMAIN_WORDS = ('drug', 'medicine', 'medication', 'tablet', 'dose', 'interact', 'side effect', 'take together')
@@ -82,3 +83,4 @@ def adjudicate(verifications, question=None, entities=None, answer=None, kg_edge
         final += ' [Verification: ' + str(len(kept)) + ' of ' + str(len(states)) + ' claims supported]'
 
     return {'final_answer': final, 'abstain': abstain, 'claim_states': states}
+

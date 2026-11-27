@@ -31,8 +31,10 @@ included if its chunk ID resolves to a processed passage.
 
 - Triple counts: record the command output in `docs/weekly_log.md`.
 - KG precision: 32% overall (16/50) on the seeded 50-row source-passage audit.
-- Recall@5: pending the shared 80-question set.
-- KG coverage: pending the shared 80-question set.
+- Recall@5: not yet measurable in this branch because Disha's retriever and the
+  final merged 80-question file are not present; this is not an inferred number.
+- KG coverage: not yet measurable in this branch because the final merged
+  80-question file is not present; this is not an inferred number.
 
 ## Aliases
 

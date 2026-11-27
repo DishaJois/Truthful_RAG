@@ -24,14 +24,9 @@ def test_heldout_files_match_finalized_reference_set():
             if line.strip() and not line.lstrip().startswith("#")
         }
     assert len(canonical) == 20
-    assert canonical == set(aliases)
-    assert all(
-        name.lower() in alias_lines
-        for generic, names in aliases.items()
-        for name in [generic, *names]
-    )
-    assert "paracetamol" in aliases["acetaminophen"]
-    assert "salbutamol" in aliases["albuterol"]
+    assert canonical.issubset(set(alias_lines))
+    assert aliases["paracetamol"] == "acetaminophen"
+    assert aliases["salbutamol"] == "albuterol"
 
 
 def test_phrase_matching_handles_multiword_and_punctuation_aliases():
@@ -40,6 +35,14 @@ def test_phrase_matching_handles_multiword_and_punctuation_aliases():
     assert find_matching_terms("Uses Toprol-XL daily", terms) == {"toprol xl"}
     assert contains_heldout_word("Avoid St. John's wort products", terms)
     assert not contains_heldout_word("The patient takes warfarin", terms)
+
+
+def test_brand_aliases_map_to_canonical_generic_names():
+    with open("data/processed/aliases.json", encoding="utf-8-sig") as handle:
+        aliases = json.load(handle)
+    assert aliases["coumadin"] == "warfarin"
+    assert aliases["advil"] == "ibuprofen"
+    assert aliases["toprol-xl"] == "metoprolol"
 
 
 def test_pass2_excludes_aliases_and_heldout_primary_labels(tmp_path):

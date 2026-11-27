@@ -1,3 +1,4 @@
+import json
 import os
 import pickle
 
@@ -10,19 +11,45 @@ CACHE = "data/kg/graph.pkl"
 
 
 def _load():
-    if os.path.exists(CACHE) and os.path.getmtime(CACHE) >= os.path.getmtime(CSV):
+    if (
+        os.path.exists(CACHE)
+        and os.path.getmtime(CACHE) >= os.path.getmtime(CSV)
+        and os.path.getmtime(CACHE) >= os.path.getmtime(__file__)
+    ):
         with open(CACHE, "rb") as handle:
             return pickle.load(handle)
     graph = nx.MultiDiGraph()
     frame = pd.read_csv(CSV, encoding="utf-8-sig")
+    valid_chunk_ids = None
+    chunk_ids_path = "data/processed/chunk_ids.json"
+    if os.path.exists(chunk_ids_path):
+        with open(chunk_ids_path, encoding="utf-8-sig") as handle:
+            valid_chunk_ids = set(str(chunk_id) for chunk_id in json.load(handle))
+    else:
+        valid_chunk_ids = set()
+        for chunk_path in (
+            "data/processed/chunks.jsonl",
+            "data/processed/ganavi_clean_chunks.jsonl",
+            "data/processed/test_ganavi_clean_chunks.jsonl",
+        ):
+            if not os.path.exists(chunk_path):
+                continue
+            with open(chunk_path, encoding="utf-8-sig") as handle:
+                for line in handle:
+                    if line.strip():
+                        valid_chunk_ids.add(str(json.loads(line)["chunk_id"]))
+            break
     for row in frame.itertuples(index=False):
         subject = str(row.subject).lower().strip()
         object_name = str(row.object).lower().strip()
+        chunk_id = str(row.chunk_id).strip()
+        if valid_chunk_ids and chunk_id not in valid_chunk_ids:
+            continue
         graph.add_edge(
             subject,
             object_name,
             relation=str(row.relation).lower().strip(),
-            chunk_id=str(row.chunk_id).strip(),
+            chunk_id=chunk_id,
         )
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
     with open(CACHE, "wb") as handle:

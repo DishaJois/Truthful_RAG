@@ -12,3 +12,8 @@
 | 2026-11-26 | Question-set contribution | Added 27 questions (13 answerable, 7 unanswerable, 7 tricky), grounded in processed Ganavi chunk IDs | `data/eval/q_ganavi.jsonl` |
 | 2026-11-27 | `python -m src.kg.audit_precision` | Labeled 50 source-passage samples: 16 correct, 34 incorrect; overall precision 32% | `data/kg/sample_to_label.csv` |
 | 2026-11-27 | `python -m src.kg.kg_filter` | Tightened generic, duplicate-name, and dictionary filtering; retained 100000 `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-27 | Ganavi alias/graph implementation | Converted `aliases.json` to alias-to-generic lookup and added chunk-ID validation to graph loading | `data/processed/aliases.json`, `src/kg/graph.py` |
+| 2026-11-27 | `python -m src.kg.build_kg` | Rebuilt 201613 deduplicated triples from Ganavi's local clean triple artifact | `data/kg/triples.csv` |
+| 2026-11-27 | `python -m src.kg.kg_filter` | Wrote 100000 filtered `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-27 | `python -m src.kg.audit_precision` | 50-row audit: 16 correct, 34 incorrect; overall precision 32% | `docs/reviews/ganavi_triple_audit_review.md` |
+| 2026-11-27 | `python -m pytest -q tests/test_ganavi_kg.py tests/test_ganavi_questions.py tests/test_heldout_aliases.py` | 8 Ganavi-focused tests passed | test runner output |

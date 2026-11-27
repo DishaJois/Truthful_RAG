@@ -22,14 +22,15 @@ when present, otherwise it falls back to the checked-in test artifacts.
 4. Apply the relation allowlist and remove low-quality dictionary terms.
 5. Retain at most 100,000 rows for GitHub and memory constraints.
 
-The committed KG export contains 100,000 rows due to the configured cap. It was generated
-after excluding held-out entities and passages; a source triple can only be included if its
-chunk ID resolves to a processed passage.
+The committed KG export contains 100,000 rows due to the configured cap after stricter
+quality filtering. It was
+generated after excluding held-out entities and passages; a source triple can only be
+included if its chunk ID resolves to a processed passage.
 
 ## Measurements
 
 - Triple counts: record the command output in `docs/weekly_log.md`.
-- KG precision: pending human labels in `data/kg/sample_to_label.csv`.
+- KG precision: 32% overall (16/50) on the seeded 50-row source-passage audit.
 - Recall@5: pending the shared 80-question set.
 - KG coverage: pending the shared 80-question set.
 

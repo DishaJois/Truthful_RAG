@@ -1,51 +1,51 @@
 subject,relation,object,chunk_id,source,correct
-escitalopram oxalate,interacts_with,citalopram,GANAVI_FINAL_006634,openFDA,
-meloxicam,interacts_with,norepinephrine,GANAVI_FINAL_017651,openFDA,
-tacrolimus,interacts_with,rifampin,GANAVI_FINAL_027651,openFDA,
-rizatriptan benzoate,interacts_with,norepinephrine,GANAVI_FINAL_028118,openFDA,
-cefdinir,interacts_with,magnesium,GANAVI_FINAL_035492,openFDA,
-rosuvastatin calcium,interacts_with,darolutamide,GANAVI_FINAL_005667,openFDA,
-methylergonovine,interacts_with,methylergonovine maleate,GANAVI_FINAL_012247,openFDA,
-brincidofovir,interacts_with,tembexa,GANAVI_FINAL_032906,openFDA,
-i.v. fat emulsion,interacts_with,intralipid,GANAVI_FINAL_034003,openFDA,
-budesonide and formoterol fumarate dihydrate,interacts_with,formoterol,GANAVI_FINAL_030445,openFDA,
-ciprofloxacin hydrochloride,interacts_with,tizanidine,GANAVI_FINAL_022965,openFDA,
-quetiapine fumarate,interacts_with,quetiapine,GANAVI_FINAL_031318,openFDA,
-clindamycin palmitate hydrochloride (pediatric),interacts_with,antibacterial,GANAVI_FINAL_030022,openFDA,
-"sodium sulfate, potassium sulfate and magnesium sulfate oral",interacts_with,bisacodyl,GANAVI_FINAL_039782,openFDA,
-lidocaine hcl,interacts_with,4% lidocaine,GANAVI_FINAL_027030,openFDA,
-paroxetine hydrochloride,interacts_with,paroxetine,GANAVI_FINAL_040979,openFDA,
-ranolazine,interacts_with,sirolimus,GANAVI_FINAL_032050,openFDA,
-somatropin,interacts_with,serostim,GANAVI_FINAL_023979,openFDA,
-levonorgestrel and ethinyl estradiol and ethinyl estradiol,interacts_with,levonorgestrel,GANAVI_FINAL_013167,openFDA,
-"pertuzumab, trastuzumab, and hyaluronidase-zzxf",interacts_with,doxorubicin,GANAVI_FINAL_000074,openFDA,
-diclofenac sodium,interacts_with,norepinephrine,GANAVI_FINAL_033635,openFDA,
-"clindamycin phosphate, benzoyl peroxide",interacts_with,clindamycin phosphate,GANAVI_FINAL_004450,openFDA,
-bupropion,interacts_with,nicotine,GANAVI_FINAL_006172,openFDA,
-ziprasidone mesylate,interacts_with,serotonin,GANAVI_FINAL_015786,openFDA,
-fluoxetine hydrochloride,interacts_with,anxiety,GANAVI_FINAL_005444,openFDA,
-varenicline tartrate,interacts_with,nicotine,GANAVI_FINAL_024500,openFDA,
-docetaxel anhydrous,interacts_with,advanced,GANAVI_FINAL_000568,openFDA,
-divalproex sodium,interacts_with,topiramate,GANAVI_FINAL_037573,openFDA,
-indomethacin,interacts_with,aspirin,GANAVI_FINAL_026974,openFDA,
-rivastigmine tartrate,interacts_with,allergy,GANAVI_FINAL_037250,openFDA,
-metaxalone,interacts_with,linezolid,GANAVI_FINAL_017298,openFDA,
-olanzapine,interacts_with,fluoxetine,GANAVI_FINAL_011475,openFDA,
-alogliptin benzoate and pioglitazone hydrochloride,interacts_with,pioglitazone,GANAVI_FINAL_021818,openFDA,
-atazanavir,interacts_with,rifabutin,GANAVI_FINAL_013845,openFDA,
-cysteine hydrochloride,interacts_with,urea,GANAVI_FINAL_019146,openFDA,
-dicyclomine hydrochloride,interacts_with,dicyclomine,GANAVI_FINAL_019646,openFDA,
-fluoxetine hydrochloride,interacts_with,buspirone,GANAVI_FINAL_020764,openFDA,
-brivaracetam,interacts_with,phenytoin,GANAVI_FINAL_040711,openFDA,
-divalproex sodium,interacts_with,ammonia,GANAVI_FINAL_028215,openFDA,
-clomipramine hydrochloride,interacts_with,haloperidol,GANAVI_FINAL_034985,openFDA,
-lovastatin,interacts_with,clarithromycin,GANAVI_FINAL_004220,openFDA,
-"dextroamphetamine saccharate, amphetamine aspartate monohydrate, dextroamphetamine sulfate, and amphetamine sulfate",interacts_with,lithium,GANAVI_FINAL_039477,openFDA,
-articaine hydrochloride and epinephrine,interacts_with,circulation,GANAVI_FINAL_018797,openFDA,
-"efavirenz, emtricitabine and tenofovir disoproxil fumarate",interacts_with,nevirapine,GANAVI_FINAL_005034,openFDA,
-rocuronium bromide,interacts_with,rocuronium,GANAVI_FINAL_030473,openFDA,
-bupropion hcl er (xl),interacts_with,bupropion hydrochloride,GANAVI_FINAL_029470,openFDA,
-quetiapine fumarate,interacts_with,quetiapine,GANAVI_FINAL_016037,openFDA,
-ziprasidone mesylate,interacts_with,a-30,GANAVI_FINAL_015796,openFDA,
-diclofenac potassium,interacts_with,indomethacin,GANAVI_FINAL_025086,openFDA,
-morphine sulfate,interacts_with,serotonin,GANAVI_FINAL_007840,openFDA,
+escitalopram oxalate,interacts_with,citalopram,GANAVI_FINAL_006634,openFDA,0
+meloxicam,interacts_with,norepinephrine,GANAVI_FINAL_017651,openFDA,0
+tacrolimus,interacts_with,rifampin,GANAVI_FINAL_027651,openFDA,1
+rizatriptan benzoate,interacts_with,norepinephrine,GANAVI_FINAL_028118,openFDA,1
+cefdinir,interacts_with,magnesium,GANAVI_FINAL_035492,openFDA,1
+rosuvastatin calcium,interacts_with,darolutamide,GANAVI_FINAL_005667,openFDA,0
+methylergonovine,interacts_with,methylergonovine maleate,GANAVI_FINAL_012247,openFDA,0
+brincidofovir,interacts_with,tembexa,GANAVI_FINAL_032906,openFDA,0
+i.v. fat emulsion,interacts_with,intralipid,GANAVI_FINAL_034003,openFDA,0
+budesonide and formoterol fumarate dihydrate,interacts_with,formoterol,GANAVI_FINAL_030445,openFDA,0
+ciprofloxacin hydrochloride,interacts_with,tizanidine,GANAVI_FINAL_022965,openFDA,0
+quetiapine fumarate,interacts_with,quetiapine,GANAVI_FINAL_031318,openFDA,0
+clindamycin palmitate hydrochloride (pediatric),interacts_with,antibacterial,GANAVI_FINAL_030022,openFDA,0
+"sodium sulfate, potassium sulfate and magnesium sulfate oral",interacts_with,bisacodyl,GANAVI_FINAL_039782,openFDA,1
+lidocaine hcl,interacts_with,4% lidocaine,GANAVI_FINAL_027030,openFDA,0
+paroxetine hydrochloride,interacts_with,paroxetine,GANAVI_FINAL_040979,openFDA,0
+ranolazine,interacts_with,sirolimus,GANAVI_FINAL_032050,openFDA,1
+somatropin,interacts_with,serostim,GANAVI_FINAL_023979,openFDA,0
+levonorgestrel and ethinyl estradiol and ethinyl estradiol,interacts_with,levonorgestrel,GANAVI_FINAL_013167,openFDA,0
+"pertuzumab, trastuzumab, and hyaluronidase-zzxf",interacts_with,doxorubicin,GANAVI_FINAL_000074,openFDA,0
+diclofenac sodium,interacts_with,norepinephrine,GANAVI_FINAL_033635,openFDA,0
+"clindamycin phosphate, benzoyl peroxide",interacts_with,clindamycin phosphate,GANAVI_FINAL_004450,openFDA,0
+bupropion,interacts_with,nicotine,GANAVI_FINAL_006172,openFDA,0
+ziprasidone mesylate,interacts_with,serotonin,GANAVI_FINAL_015786,openFDA,0
+fluoxetine hydrochloride,interacts_with,anxiety,GANAVI_FINAL_005444,openFDA,0
+varenicline tartrate,interacts_with,nicotine,GANAVI_FINAL_024500,openFDA,0
+docetaxel anhydrous,interacts_with,advanced,GANAVI_FINAL_000568,openFDA,0
+divalproex sodium,interacts_with,topiramate,GANAVI_FINAL_037573,openFDA,1
+indomethacin,interacts_with,aspirin,GANAVI_FINAL_026974,openFDA,1
+rivastigmine tartrate,interacts_with,allergy,GANAVI_FINAL_037250,openFDA,0
+metaxalone,interacts_with,linezolid,GANAVI_FINAL_017298,openFDA,1
+olanzapine,interacts_with,fluoxetine,GANAVI_FINAL_011475,openFDA,0
+alogliptin benzoate and pioglitazone hydrochloride,interacts_with,pioglitazone,GANAVI_FINAL_021818,openFDA,0
+atazanavir,interacts_with,rifabutin,GANAVI_FINAL_013845,openFDA,1
+cysteine hydrochloride,interacts_with,urea,GANAVI_FINAL_019146,openFDA,0
+dicyclomine hydrochloride,interacts_with,dicyclomine,GANAVI_FINAL_019646,openFDA,0
+fluoxetine hydrochloride,interacts_with,buspirone,GANAVI_FINAL_020764,openFDA,1
+brivaracetam,interacts_with,phenytoin,GANAVI_FINAL_040711,openFDA,1
+divalproex sodium,interacts_with,ammonia,GANAVI_FINAL_028215,openFDA,0
+clomipramine hydrochloride,interacts_with,haloperidol,GANAVI_FINAL_034985,openFDA,1
+lovastatin,interacts_with,clarithromycin,GANAVI_FINAL_004220,openFDA,1
+"dextroamphetamine saccharate, amphetamine aspartate monohydrate, dextroamphetamine sulfate, and amphetamine sulfate",interacts_with,lithium,GANAVI_FINAL_039477,openFDA,1
+articaine hydrochloride and epinephrine,interacts_with,circulation,GANAVI_FINAL_018797,openFDA,0
+"efavirenz, emtricitabine and tenofovir disoproxil fumarate",interacts_with,nevirapine,GANAVI_FINAL_005034,openFDA,0
+rocuronium bromide,interacts_with,rocuronium,GANAVI_FINAL_030473,openFDA,0
+bupropion hcl er (xl),interacts_with,bupropion hydrochloride,GANAVI_FINAL_029470,openFDA,0
+quetiapine fumarate,interacts_with,quetiapine,GANAVI_FINAL_016037,openFDA,0
+ziprasidone mesylate,interacts_with,a-30,GANAVI_FINAL_015796,openFDA,0
+diclofenac potassium,interacts_with,indomethacin,GANAVI_FINAL_025086,openFDA,1
+morphine sulfate,interacts_with,serotonin,GANAVI_FINAL_007840,openFDA,1

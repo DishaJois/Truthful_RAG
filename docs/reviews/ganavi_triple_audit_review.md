@@ -9,18 +9,16 @@
 
 ## Audit status
 
-The source passages and labeled rows are required to determine precision. This file does
-not publish invented precision numbers.
+The 50-row sample is labeled against its source passage:
 
-The current repository build has the following evidence:
+- Correct: 16 triples
+- Incorrect: 34 triples
+- Overall precision: 32%
+- Per-relation precision: `interacts_with` = 32% (16/50)
 
-- The final openFDA partitions 1-9 triple file was not present on this branch.
-- Ganavi's partitions 1-5 intermediate corpus is available locally; when processed,
-  it is preferred over the smaller checked-in test fixture.
-- The test fixture fallback is `data/processed/test_ganavi_clean_triples.csv`,
-  resolved against `data/processed/test_ganavi_clean_chunks.jsonl`.
-- The build excludes all canonical held-out names and aliases from both entity
-  fields and source passage text. The finalized reference was supplied by Sudarshan.
+The low precision is attributable mainly to the broad extraction fallback treating
+class names, symptoms, generic nouns, and duplicate drug-name variants as interaction
+entities. These rows should not be presented as direct, clinically specific edges.
 
 ## Commands
 
@@ -28,17 +26,17 @@ The current repository build has the following evidence:
 python -m src.kg.build_kg
 python -m src.kg.kg_filter
 python -m src.kg.show_sample
+python -m src.kg.audit_precision
 ```
 
 ## Results
 
-- **Correct**: TBD, pending source-passage labels
-- **Incorrect**: TBD, pending source-passage labels
-- **Per-relation precision**: TBD
-- **Overall precision**: TBD
+- **Correct**: 16
+- **Incorrect**: 34
+- **Per-relation precision**: `interacts_with` = 32%
+- **Overall precision**: 32%
 
 ## Remaining work
 
-The finalized held-out names and aliases are now recorded in
-`docs/heldout_drugs.txt` and `docs/heldout_drug_aliases.txt`. Disha must review the
-labeled 50-row sample and enter the human judgments before precision can be reported.
+The finalized held-out names and aliases are recorded in
+`docs/heldout_drugs.txt` and `docs/heldout_drug_aliases.txt`.

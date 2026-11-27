@@ -5,7 +5,8 @@ from src.kg.graph import kg_lookup
 from src.generation.generate import generate
 from src.verification.claims import extract_claims
 from src.verification.verifier import verify_claim
-from src.adjudication.adjudicator import adjudicate
+from src.adjudication.adjudicator import adjudicate, ABSTAIN_MSG
+from src.repair.repair import repair_all, must_abstain
 
 def merge_kg(evidence, edges, max_total=5):
     out = [dict(e) for e in evidence]
@@ -27,16 +28,26 @@ def run_pipeline(question, config):
     entities = detect_entities(question)
     evidence = retrieve(question, k=5)
     kg_edges = []
-    if config in ('B', 'D'):
+    if config in ('B', 'D', 'E'):
         kg_edges = kg_lookup(entities, max_edges=5)
         evidence = merge_kg(evidence, kg_edges, max_total=5)
     answer = generate(question, evidence)
-    claims, final, abstained = [], answer, False
-    if config in ('C', 'D'):
+    claims, repairs, final, abstained = [], [], answer, False
+    if config in ('C', 'D', 'E'):
         verifications = [verify_claim(c, evidence) for c in extract_claims(answer)]
         res = adjudicate(verifications, question=question, entities=entities, answer=answer,
                          kg_edges=kg_edges, retrieved_ids={e['chunk_id'] for e in evidence},
-                         filter_claims=(config == 'D'), use_abstention=(config == 'D'))
+                         filter_claims=(config in ('D', 'E')), use_abstention=(config in ('D', 'E')))
         claims, final, abstained = res['claim_states'], res['final_answer'], res['abstain']
+        if config == 'E' and claims and not abstained:
+            if must_abstain(claims):
+                abstained, final = True, ABSTAIN_MSG + ' Reason: high-risk contradicted or unsafe claim.'
+            else:
+                repaired_text, repairs = repair_all(claims, evidence)
+                if repaired_text.strip():
+                    final = repaired_text
+                else:
+                    abstained, final = True, ABSTAIN_MSG
     return {'question': question, 'config': config, 'answer': final, 'abstained': abstained,
-            'evidence': evidence, 'claims': claims, 'latency_s': round(time.perf_counter() - t0, 2)}
+            'evidence': evidence, 'claims': claims, 'repairs': repairs,
+            'latency_s': round(time.perf_counter() - t0, 2)}

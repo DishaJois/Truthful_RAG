@@ -25,7 +25,7 @@ def detect_entities(text):
     for t in toks:
         if t in covered or t in STOP or len(t) < 6:
             continue
-        m = process.extractone(t, DRUGS, scorer=fuzz.ratio, score_cutoff=90)
+        m = process.extractOne(t, DRUGS, scorer=fuzz.ratio, score_cutoff=90)
         if m and m[0] not in found:
             found.append(m[0])
     return found

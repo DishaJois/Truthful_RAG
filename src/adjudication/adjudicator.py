@@ -21,7 +21,7 @@ def kg_supports(claim, kg_edges, retrieved_ids):
             return True
     return False
 
-def should_abstain(claim_states, threshold=0.30):
+def should_abstain(claim_states, threshold=0.50):
     if not claim_states:
         return True
     bad = sum(1 for c in claim_states if c['state'] in BAD)

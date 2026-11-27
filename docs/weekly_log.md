@@ -17,3 +17,4 @@
 | 2026-11-27 | `python -m src.kg.kg_filter` | Wrote 100000 filtered `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
 | 2026-11-27 | `python -m src.kg.audit_precision` | 50-row audit: 16 correct, 34 incorrect; overall precision 32% | `docs/reviews/ganavi_triple_audit_review.md` |
 | 2026-11-27 | `python -m pytest -q tests/test_ganavi_kg.py tests/test_ganavi_questions.py tests/test_heldout_aliases.py` | 8 Ganavi-focused tests passed | test runner output |
+| 2026-11-27 | Remote retrieval integration | Fetched Disha's retriever and entity implementation from `origin/disha/gen-verify`; corrected alias lookup, fuzzy matching, and added the `w_dense` re-ranking interface required by Ganavi tuning | `src/retrieval/entities.py`, `src/retrieval/retriever.py` |

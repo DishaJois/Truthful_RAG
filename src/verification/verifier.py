@@ -1,10 +1,10 @@
-import json
+﻿import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from src.generation.llm import chat
 
 _emb = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-SIM_THRESHOLD = 0.25
+SIM_THRESHOLD = 0.30
 HIGH_RISK = ('contraindicated', 'fatal', 'avoid', 'dose', 'overdose', 'death', 'life-threatening', 'severe')
 LABELS = {'SUPPORTED', 'PARTIALLY_SUPPORTED', 'CONTRADICTED', 'CONFLICTING_EVIDENCE', 'INSUFFICIENT_EVIDENCE'}
 BASE_CONF = {

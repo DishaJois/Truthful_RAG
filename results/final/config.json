@@ -1,0 +1,10 @@
+﻿{
+  "llm": "llama3.2:3b",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "verifier_sim_threshold": 0.30,
+  "abstain_threshold": 0.49,
+  "hybrid_dense_weight": 0.7,
+  "ddi_cap": 2,
+  "top_k": 5,
+  "kg_boost": 0.15
+}

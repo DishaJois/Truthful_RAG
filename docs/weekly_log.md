@@ -1,9 +1,24 @@
-﻿2026-11-27 | python -m src.verification.eval_verifier | accuracy 22/30 = 0.73 (first measurement, SIM_THRESHOLD=0.25) | results/verifier_accuracy.txt
-2026-11-27 | python -m src.verification.sweep_sim | SIM_THRESHOLD=0.30 selected (23/30 = 0.77 vs 0.73 at 0.25) | src/verification/verifier.py
-2026-11-27 | python -m src.verification.eval_verifier | accuracy 25/40 = 0.62 (40-claim gold set, SIM_THRESHOLD=0.30) | results/verifier_accuracy.txt
-2026-11-27 | python -m src.verification.sweep_sim | SIM_THRESHOLD=0.30 confirmed on 40-claim gold set (25/40 = 0.62 vs 0.60 at 0.25) | src/verification/verifier.py
-2026-11-27 | python -m src.verification.eval_verifier | before Day 3 fix: accuracy 25/40 = 0.62 (CONFLICTING_EVIDENCE 0/4, broad HIGH_RISK) | results/verifier_accuracy.txt
-2026-11-27 | python -m src.verification.eval_verifier | after Day 3 fix: accuracy 30/40 = 0.75 (multi-passage conflict detection + trimmed HIGH_RISK + concise prompt v2) | results/verifier_accuracy.txt
-2026-11-27 | python -m src.adjudication.tune_threshold | abstain threshold=0.50 selected (precision=0.50, recall=1.00, F1=0.67 vs F1=0.64 at 0.30) | src/adjudication/adjudicator.py
-2026-11-27 | python -m src.repair.show_repairs | repairs checked by hand: 11 | good 6 | harmless 3 | wrong 2 | results/runs/E_*.jsonl
-2026-11-27 | pytest -q | abstain threshold set to 0.49 (boundary fix so 50% bad claims trigger abstention; 25 passed) | src/adjudication/adjudicator.py
+| date | command | result | file |
+|---|---|---|---|
+| 2026-11-25 | `python -m src.kg.build_kg` | Built 243770 deduplicated triples from the available Ganavi fallback artifact | `data/kg/triples.csv` |
+| 2026-11-25 | `python -m src.kg.kg_filter` | Retained 92453 filtered `interacts_with` triples after quality filtering | `data/kg/triples.csv` |
+| 2026-11-25 | `python -m src.kg.show_sample` | Created a 50-row source-passage labeling sample | `data/kg/sample_to_label.csv` |
+| 2026-11-25 | `python -m pytest -q tests/test_ganavi_kg.py` | 2 focused KG tests passed | test runner output |
+| 2026-11-26 | `python -m src.kg.build_kg` | Rebuilt 170645 triples after removing held-out entities and passages using Sudarshan's finalized reference | `data/kg/triples.csv` |
+| 2026-11-26 | `python -m src.kg.kg_filter` | Retained 100000 quality-filtered `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-26 | `python -m pytest -q tests/test_heldout_aliases.py tests/test_ganavi_kg.py` | 5 tests passed; checked alias and phrase filtering | test runner output |
+| 2026-11-26 | `python src/data/openfda_process.py --tag-intermediate ...` | Reprocessed partitions 1-5 with finalized held-out names: 63993 chunks, 201613 triples; 14593 primary/tag removals | local processed outputs |
+| 2026-11-26 | `python -m src.kg.build_kg` and `python -m src.kg.kg_filter` | Built from Ganavi partitions 1-5 and wrote 100000 triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-26 | Question-set contribution | Added 27 questions (13 answerable, 7 unanswerable, 7 tricky), grounded in processed Ganavi chunk IDs | `data/eval/q_ganavi.jsonl` |
+| 2026-11-27 | `python -m src.kg.audit_precision` | Labeled 50 source-passage samples: 16 correct, 34 incorrect; overall precision 32% | `data/kg/sample_to_label.csv` |
+| 2026-11-27 | `python -m src.kg.kg_filter` | Tightened generic, duplicate-name, and dictionary filtering; retained 100000 `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-27 | Ganavi alias/graph implementation | Converted `aliases.json` to alias-to-generic lookup and added chunk-ID validation to graph loading | `data/processed/aliases.json`, `src/kg/graph.py` |
+| 2026-11-27 | `python -m src.kg.build_kg` | Rebuilt 201613 deduplicated triples from Ganavi's local clean triple artifact | `data/kg/triples.csv` |
+| 2026-11-27 | `python -m src.kg.kg_filter` | Wrote 100000 filtered `interacts_with` triples (configured cap) | `data/kg/triples.csv` |
+| 2026-11-27 | `python -m src.kg.audit_precision` | 50-row audit: 16 correct, 34 incorrect; overall precision 32% | `docs/reviews/ganavi_triple_audit_review.md` |
+| 2026-11-27 | `python -m pytest -q tests/test_ganavi_kg.py tests/test_ganavi_questions.py tests/test_heldout_aliases.py` | 8 Ganavi-focused tests passed | test runner output |
+| 2026-11-27 | Remote retrieval integration | Fetched Disha's retriever and entity implementation from `origin/disha/gen-verify`; corrected alias lookup, fuzzy matching, and added the `w_dense` re-ranking interface required by Ganavi tuning | `src/retrieval/entities.py`, `src/retrieval/retriever.py` |
+| 2026-11-28 | `python tools/audit_state.py` | Canonical corpus audited: 286233 chunks, 286233 FAISS vectors, 39838 drug dictionary lines, 2 question rows | `data/processed/`, `data/eval/questions.jsonl` |
+| 2026-11-28 | Real retrieval smoke test | Warfarin/aspirin, naproxen, and clarithromycin/simvastatin returned real IDs; no claim that this is Recall@5 without a gold question set | `src/retrieval/retriever.py` |
+| 2026-11-28 | Ganavi continuation status | Recall@5 and KG coverage blocked: Sudarshan's question contribution and merged 80-question file are not available | `docs/data_card_ganavi.md` |
+| 2026-11-28 | Entity alias smoke test | `Coumadin + Advil` resolved to `warfarin + ibuprofen`; `Toprol-XL + warfarin` resolved to `metoprolol + warfarin`; off-domain France query resolved no entities | `src/retrieval/entities.py` |

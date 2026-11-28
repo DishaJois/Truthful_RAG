@@ -1,4 +1,3 @@
-
 import argparse
 import csv
 import hashlib
@@ -6,269 +5,126 @@ import json
 import os
 import re
 import zipfile
-from typing import Dict, List, Set, Any
-
-
-# ================= COMMON HELPERS =================
-
-def normalize_drug_text(text: str) -> str:
-    """
-    Convert drug names and text into a consistent format.
-
-    Example:
-        Amoxicillin-Clavulanate -> amoxicillin clavulanate
-        Sodium   Chloride       -> sodium chloride
-    """
-    text = text.lower()
-    text = re.sub(r"[^\w]+", " ", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
-
+from pathlib import Path
+from typing import Dict, List, Set
 
 def load_heldout(heldout_path: str, aliases_path: str) -> Set[str]:
-    """
-    Load canonical held-out drug names and their aliases.
-    Ignore blank lines and comments beginning with #.
-    """
     heldout = set()
-
     for path in [heldout_path, aliases_path]:
         if path and os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 for line in f:
-                    item = line.strip()
-
+                    item = line.strip().lower()
                     if item and not item.startswith("#"):
-                        normalized = normalize_drug_text(item)
-
-                        if normalized:
-                            heldout.add(normalized)
-
+                        heldout.add(item)
     return heldout
-
-
-def build_drug_matcher(drug_dict: Set[str]) -> Dict[str, Any]:
-    """
-    Build a token trie for efficient multi-word drug matching.
-
-    The trie is built once and reused for all passages.
-    """
-    root = {}
-
-    for drug in drug_dict:
-        normalized = normalize_drug_text(drug)
-
-        if not normalized:
-            continue
-
-        tokens = normalized.split()
-        node = root
-
-        for token in tokens:
-            if token not in node:
-                node[token] = {}
-
-            node = node[token]
-
-        # None marks the end of a complete drug name.
-        node.setdefault(None, []).append(drug)
-
-    return root
-
-
-def find_drug_matches(text: str, matcher: Dict[str, Any]) -> List[str]:
-    """
-    Find complete drug-name phrases in text using the trie.
-
-    Supports single-word and multi-word drug names.
-    Avoids matching partial words.
-    """
-    tokens = normalize_drug_text(text).split()
-    matches = set()
-
-    for start in range(len(tokens)):
-        node = matcher
-
-        for token in tokens[start:]:
-            if token not in node:
-                break
-
-            node = node[token]
-
-            if None in node:
-                matches.update(node[None])
-
-    return sorted(matches)
-
-
-def contains_heldout_word(
-    text: str,
-    heldout_matcher: Dict[str, Any]
-) -> bool:
-    """
-    Check whether text contains any complete held-out drug name or alias.
-    """
-    return bool(find_drug_matches(text, heldout_matcher))
-
 
 def clean_text(text: str) -> str:
     text = re.sub(r"<[^>]+>", " ", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
+def build_term_trie(terms: Set[str]):
+    trie = {}
+    for term in terms:
+        term_tokens = re.findall(r"\b\w+\b", term.lower())
+        if not term_tokens:
+            continue
+        node = trie
+        for token in term_tokens:
+            node = node.setdefault(token, {})
+        node.setdefault(None, set()).add(term)
+    return trie
 
-def chunk_text(
-    text: str,
-    chunk_size: int = 200,
-    overlap: int = 30
-) -> List[str]:
+def match_trie(text: str, trie) -> Set[str]:
+    tokens = re.findall(r"\b\w+\b", text.lower())
+    matches = set()
+    for start in range(len(tokens)):
+        node = trie
+        position = start
+        while position < len(tokens):
+            node = node.get(tokens[position])
+            if node is None:
+                break
+            matches.update(node.get(None, ()))
+            position += 1
+    return matches
 
+def find_matching_terms(text: str, terms: Set[str]) -> Set[str]:
+    return match_trie(text, build_term_trie(terms))
+
+def chunk_text(text: str, chunk_size: int = 200, overlap: int = 30) -> List[str]:
     words = text.split()
-
     if len(words) <= chunk_size:
         return [text]
-
     chunks = []
     step = chunk_size - overlap
-
     for i in range(0, len(words), step):
         chunk = " ".join(words[i:i + chunk_size])
         chunks.append(chunk)
-
         if i + chunk_size >= len(words):
             break
-
     return chunks
 
-
-def create_parent_directory(path: str):
-    """Create the parent directory only when one is specified."""
-    parent = os.path.dirname(path)
-
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-
+def contains_heldout_word(text: str, heldout_set: Set[str]) -> bool:
+    return bool(find_matching_terms(text, heldout_set))
 
 # ================= PASS 1: COLLECT NAMES & UNTAGGED CHUNKS =================
-
-def run_pass1(
-    files: List[int],
-    raw_dir: str,
-    intermediate_out: str,
-    names_out: str,
-    heldout_set: Set[str]
-):
-
-    create_parent_directory(intermediate_out)
-    create_parent_directory(names_out)
+def run_pass1(files: List[int], raw_dir: str, intermediate_out: str, names_out: str, heldout_set: Set[str]):
+    os.makedirs(os.path.dirname(intermediate_out), exist_ok=True)
+    os.makedirs(os.path.dirname(names_out), exist_ok=True)
 
     discovered_drugs = set()
+    heldout_trie = build_term_trie(heldout_set)
     intermediate_chunks = []
     seen_hashes = set()
 
-    # Normalize held-out names before comparing primary drug names.
-    normalized_heldout = {
-        normalize_drug_text(name)
-        for name in heldout_set
-    }
-
     for p in files:
-
-        zip_path = os.path.join(
-            raw_dir,
-            f"drug-label-{p:04d}-of-0013.json.zip"
-        )
-
+        zip_path = os.path.join(raw_dir, f"drug-label-{p:04d}-of-0013.json.zip")
         if not os.path.exists(zip_path):
             print(f"Warning: {zip_path} not found. Skipping.")
             continue
 
-        print(f"Processing OpenFDA partition {p}...")
-
         with zipfile.ZipFile(zip_path, "r") as zf:
-
             for member in zf.namelist():
-
                 if not member.endswith(".json"):
                     continue
-
                 with zf.open(member) as jf:
-
                     data = json.load(jf)
-
                     for result in data.get("results", []):
-
                         openfda = result.get("openfda", {})
-
-                        generic_names = [
-                            g.lower().strip()
-                            for g in openfda.get("generic_name", [])
-                            if g
-                        ]
-
-                        brand_names = [
-                            b.lower().strip()
-                            for b in openfda.get("brand_name", [])
-                            if b
-                        ]
-
-                        substance_names = [
-                            s.lower().strip()
-                            for s in openfda.get("substance_name", [])
-                            if s
-                        ]
+                        generic_names = [g.lower().strip() for g in openfda.get("generic_name", []) if g]
+                        brand_names = [b.lower().strip() for b in openfda.get("brand_name", []) if b]
+                        substance_names = [s.lower().strip() for s in openfda.get("substance_name", []) if s]
 
                         if not generic_names:
                             continue
 
                         primary_drug = generic_names[0]
+                        # Collect all names for unioning
+                        for n in generic_names + brand_names + substance_names:
+                            if len(n) >= 4:
+                                discovered_drugs.add(n)
 
-                        # Collect all names for team dictionary union.
-                        for name in (
-                            generic_names + brand_names + substance_names
-                        ):
-                            if len(name) >= 4:
-                                discovered_drugs.add(name)
-
-                        # Exclude held-out primary drugs.
-                        if normalize_drug_text(primary_drug) in normalized_heldout:
+                        # Primary label exclusion: drop if primary generic is held out
+                        if match_trie(primary_drug, heldout_trie):
                             continue
 
                         set_id = result.get("set_id", "unknown_set")
-
-                        sections = [
-                            "drug_interactions",
-                            "warnings",
-                            "warnings_and_cautions"
-                        ]
+                        sections = ["drug_interactions", "warnings", "warnings_and_cautions"]
 
                         for sec in sections:
-
                             sec_text_list = result.get(sec, [])
-
                             if not sec_text_list:
                                 continue
-
-                            full_sec_text = clean_text(
-                                " ".join(sec_text_list)
-                            )
-
+                            full_sec_text = clean_text(" ".join(sec_text_list))
                             if len(full_sec_text.split()) < 30:
                                 continue
 
-                            for passage in chunk_text(
-                                full_sec_text,
-                                chunk_size=200,
-                                overlap=30
-                            ):
-
-                                h = hashlib.md5(
-                                    passage.encode("utf-8")
-                                ).hexdigest()
-
+                            for passage in chunk_text(full_sec_text, chunk_size=200, overlap=30):
+                                h = hashlib.md5(passage.encode("utf-8")).hexdigest()
                                 if h in seen_hashes:
                                     continue
-
                                 seen_hashes.add(h)
 
                                 intermediate_chunks.append({
@@ -278,108 +134,60 @@ def run_pass1(
                                     "text": passage
                                 })
 
-    # Save intermediate passages.
+    # Write intermediate untagged chunks
     with open(intermediate_out, "w", encoding="utf-8") as f:
+        for c in intermediate_chunks:
+            f.write(json.dumps(c) + "\n")
 
-        for chunk in intermediate_chunks:
-            f.write(json.dumps(chunk) + "\n")
-
-    # Save discovered drug names.
+    # Write collected names
     with open(names_out, "w", encoding="utf-8") as f:
+        json.dump(sorted(list(discovered_drugs)), f, indent=2)
 
-        json.dump(
-            sorted(list(discovered_drugs)),
-            f,
-            indent=2
-        )
-
-    print("\nPass 1 finished:")
-    print(f"  Passages saved: {len(intermediate_chunks)}")
-    print(f"  Distinct drug names: {len(discovered_drugs)}")
-
+    print(f"Pass 1 finished: {len(intermediate_chunks)} passages saved, {len(discovered_drugs)} distinct drug names collected.")
 
 # ================= PASS 2: TAG & FILTER WITH FROZEN DICTIONARY =================
-
-def run_pass2(
-    intermediate_in: str,
-    prefix: str,
-    drugs_file: str,
-    heldout_file: str,
-    aliases_file: str,
-    chunks_out: str,
-    triples_out: str
-):
-
-    # Load frozen team drug dictionary.
+def run_pass2(intermediate_in: str, prefix: str, drugs_file: str, aliases_file: str, chunks_out: str, triples_out: str, heldout_file: str = "docs/heldout_drugs.txt"):
     with open(drugs_file, "r", encoding="utf-8") as f:
-        drug_dict = {
-            drug.strip().lower()
-            for drug in json.load(f)
-            if drug and drug.strip()
-        }
+        drug_dict = set(json.load(f))
+    heldout_set = load_heldout(heldout_file, aliases_file)
+    heldout_trie = build_term_trie(heldout_set)
+    drug_trie = build_term_trie(drug_dict)
 
-    # Load canonical held-out names AND aliases.
-    heldout_set = load_heldout(
-        heldout_file,
-        aliases_file
-    )
-
-    print(f"Loaded drug dictionary: {len(drug_dict)} names")
-    print(f"Loaded held-out names and aliases: {len(heldout_set)}")
-
-    # Build both matchers only once.
-    print("Building drug matcher...")
-    drug_matcher = build_drug_matcher(drug_dict)
-
-    print("Building held-out matcher...")
-    heldout_matcher = build_drug_matcher(heldout_set)
-
-    create_parent_directory(chunks_out)
-    create_parent_directory(triples_out)
+    os.makedirs(os.path.dirname(chunks_out), exist_ok=True)
+    os.makedirs(os.path.dirname(triples_out), exist_ok=True)
 
     final_chunks = []
     final_triples = []
-
     chunk_counter = 1
 
     tag_removals = 0
     text_removals = 0
-    unmatched_passages = 0
 
     with open(intermediate_in, "r", encoding="utf-8") as f:
-
         for line in f:
-
             item = json.loads(line)
-
             text = item["text"]
             primary_drug = item["primary_drug"]
-
-            # Find single-word and multi-word drug names.
-            tagged_drugs = find_drug_matches(
-                text,
-                drug_matcher
-            )
-
-            if not tagged_drugs:
-                unmatched_passages += 1
-                continue
-
-            # Remove passages containing held-out drug tags.
-            if any(
-                normalize_drug_text(drug) in heldout_set
-                for drug in tagged_drugs
-            ):
+            if match_trie(primary_drug, heldout_trie):
                 tag_removals += 1
                 continue
 
-            # Remove passages containing held-out names or aliases.
-            if contains_heldout_word(text, heldout_matcher):
+            # Tag drugs present in text
+            tagged_drugs = sorted(match_trie(text, drug_trie))
+
+            if not tagged_drugs:
+                continue
+
+            # Held-out filtering: tags and whole-word text
+            if any(match_trie(drug, heldout_trie) for drug in tagged_drugs):
+                tag_removals += 1
+                continue
+
+            if match_trie(text, heldout_trie):
                 text_removals += 1
                 continue
 
             chunk_id = f"{prefix}_{chunk_counter:06d}"
-
             final_chunks.append({
                 "chunk_id": chunk_id,
                 "doc_id": item["doc_id"],
@@ -388,18 +196,9 @@ def run_pass2(
                 "drugs": tagged_drugs
             })
 
-            # Generate rule-based interaction triples.
-            normalized_primary = normalize_drug_text(primary_drug)
-
+            # Rule-based triples
             for other_drug in tagged_drugs:
-
-                normalized_other = normalize_drug_text(other_drug)
-
-                if (
-                    normalized_other != normalized_primary
-                    and normalized_other not in heldout_set
-                ):
-
+                if other_drug != primary_drug and not match_trie(other_drug, heldout_trie):
                     final_triples.append({
                         "subject": primary_drug,
                         "relation": "interacts_with",
@@ -410,129 +209,42 @@ def run_pass2(
 
             chunk_counter += 1
 
-    # Save final chunks.
     with open(chunks_out, "w", encoding="utf-8") as f:
+        for c in final_chunks:
+            f.write(json.dumps(c) + "\n")
 
-        for chunk in final_chunks:
-            f.write(json.dumps(chunk) + "\n")
-
-    # Save triples.
     with open(triples_out, "w", newline="", encoding="utf-8") as f:
-
-        writer = csv.DictWriter(
-            f,
-            fieldnames=[
-                "subject",
-                "relation",
-                "object",
-                "chunk_id",
-                "source"
-            ]
-        )
-
+        writer = csv.DictWriter(f, fieldnames=["subject", "relation", "object", "chunk_id", "source"])
         writer.writeheader()
         writer.writerows(final_triples)
 
-    print(f"\nPass 2 finished for prefix '{prefix}':")
-    print(f"  Chunks: {len(final_chunks)}")
-    print(f"  Triples: {len(final_triples)}")
-    print(f"  Held-out tag removals: {tag_removals}")
-    print(f"  Held-out text removals: {text_removals}")
-    print(f"  Unmatched passages: {unmatched_passages}")
-
-
-# ================= MAIN =================
+    print(f"Pass 2 finished for prefix '{prefix}':")
+    print(f"  Chunks: {len(final_chunks)} | Triples: {len(final_triples)}")
+    print(f"  Held-out tag removals: {tag_removals} | Held-out text removals: {text_removals}")
 
 def main():
-
     parser = argparse.ArgumentParser()
-
     parser.add_argument("--collect-names", action="store_true")
     parser.add_argument("--tag-intermediate", action="store_true")
-
     parser.add_argument("--files", nargs="+", type=int)
-
-    parser.add_argument(
-        "--raw-dir",
-        default="data/raw/openfda/"
-    )
-
+    parser.add_argument("--raw-dir", default="data/raw/openfda/")
     parser.add_argument("--intermediate-out")
     parser.add_argument("--intermediate-in")
     parser.add_argument("--names-out")
     parser.add_argument("--prefix")
-
-    parser.add_argument(
-        "--drugs",
-        default="data/processed/drugs_of.json"
-    )
-
-    parser.add_argument(
-        "--heldout",
-        default="docs/heldout_drugs.txt"
-    )
-
-    parser.add_argument(
-        "--heldout-aliases",
-        default="docs/heldout_drug_aliases.txt"
-    )
-
+    parser.add_argument("--drugs", default="data/processed/drugs_of.json")
+    parser.add_argument("--heldout-aliases", default="docs/heldout_drug_aliases.txt")
+    parser.add_argument("--heldout-drugs", default="docs/heldout_drugs.txt")
     parser.add_argument("--chunks-out")
     parser.add_argument("--triples-out")
-
     args = parser.parse_args()
 
+    heldout_set = load_heldout("docs/heldout_drugs.txt", args.heldout_aliases)
+
     if args.collect_names:
-
-        if not args.files or not args.intermediate_out or not args.names_out:
-            parser.error(
-                "--collect-names requires --files, "
-                "--intermediate-out and --names-out"
-            )
-
-        heldout_set = load_heldout(
-            args.heldout,
-            args.heldout_aliases
-        )
-
-        run_pass1(
-            args.files,
-            args.raw_dir,
-            args.intermediate_out,
-            args.names_out,
-            heldout_set
-        )
-
+        run_pass1(args.files, args.raw_dir, args.intermediate_out, args.names_out, heldout_set)
     elif args.tag_intermediate:
-
-        required = [
-            args.intermediate_in,
-            args.prefix,
-            args.chunks_out,
-            args.triples_out
-        ]
-
-        if not all(required):
-            parser.error(
-                "--tag-intermediate requires --intermediate-in, "
-                "--prefix, --chunks-out and --triples-out"
-            )
-
-        run_pass2(
-            args.intermediate_in,
-            args.prefix,
-            args.drugs,
-            args.heldout,
-            args.heldout_aliases,
-            args.chunks_out,
-            args.triples_out
-        )
-
-    else:
-        parser.error(
-            "Specify either --collect-names or --tag-intermediate"
-        )
-
+        run_pass2(args.intermediate_in, args.prefix, args.drugs, args.heldout_aliases, args.chunks_out, args.triples_out, args.heldout_drugs)
 
 if __name__ == "__main__":
     main()

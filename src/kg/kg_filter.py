@@ -1,0 +1,68 @@
+import csv
+import json
+import os
+
+from src.data.openfda_process import build_term_trie, load_heldout, match_trie
+
+BAD_TERMS = {
+    "serum", "lead", "metabolism", "health", "diarrhea", "headache",
+    "water", "treat", "prevention", "thyroid", "alcohol", "sodium",
+    "calcium", "potassium", "norepinephrine", "serotonin", "anxiety",
+    "advanced", "allergy", "ammonia", "urea", "circulation", "nicotine",
+    "a-30", "arthritis",
+}
+ALLOWED_RELATIONS = {"interacts_with", "increases_effect_of", "decreases_effect_of", "contraindicated_with"}
+
+
+def kg_filter(source="data/kg/triples.csv", output="data/kg/triples.csv", max_rows=100000):
+    if not os.path.exists(source):
+        raise FileNotFoundError(f"{source} does not exist")
+    heldout = load_heldout("docs/heldout_drugs.txt", "docs/heldout_drug_aliases.txt")
+    heldout_trie = build_term_trie(heldout)
+    drug_terms = set()
+    drug_dictionary = "data/processed/drugs_ganavi_clean.json"
+    if os.path.exists(drug_dictionary):
+        with open(drug_dictionary, encoding="utf-8-sig") as handle:
+            drug_terms = {
+                str(term).lower().strip()
+                for term in json.load(handle)
+                if str(term).strip()
+            }
+    kept = []
+    counts = {}
+    with open(source, encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            relation = row["relation"].lower().strip()
+            subject = row["subject"].lower().strip()
+            object_name = row["object"].lower().strip()
+            if relation not in ALLOWED_RELATIONS:
+                continue
+            if match_trie(subject, heldout_trie) or match_trie(object_name, heldout_trie):
+                continue
+            if subject in BAD_TERMS or object_name in BAD_TERMS:
+                continue
+            if subject == object_name:
+                continue
+            if subject in object_name or object_name in subject:
+                continue
+            if len(subject) < 3 or len(object_name) < 3:
+                continue
+            if drug_terms:
+                if subject not in drug_terms or object_name not in drug_terms:
+                    continue
+            kept.append(row)
+            counts[relation] = counts.get(relation, 0) + 1
+            if len(kept) >= max_rows:
+                break
+
+    os.makedirs(os.path.dirname(output), exist_ok=True)
+    with open(output, "w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["subject", "relation", "object", "chunk_id", "source"])
+        writer.writeheader()
+        writer.writerows(kept)
+    print(f"Wrote {len(kept)} filtered triples to {output}")
+    print(counts)
+
+
+if __name__ == "__main__":
+    kg_filter()

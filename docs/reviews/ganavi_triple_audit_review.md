@@ -1,32 +1,42 @@
-# Review Record: Ganavi 50-Triple Precision Audit
+# Review Record: Ganavi Triple Precision Audit
 
-- **Artifact**: `triples_of_ganavi.csv` (50-sample stratified audit)
-- **Producer / Commit**: Ganavi / `<commit-hash>`
+- **Artifact**: `data/kg/triples.csv`
+- **Labeling sample**: `data/kg/sample_to_label.csv`
+- **Producer**: Ganavi
 - **Reviewer**: Disha
-- **Sample Size**: 50 triples
-- **Sampling Method**: Stratified by relation type across openFDA partitions 1–5
+- **Sample size**: 50 triples
+- **Sampling method**: Seeded sample across the available built CSV
 
-## Checks Performed
-1. Validated subject entity matches primary drug of the openFDA label.
-2. Validated object entity is an interacting co-occurring drug in the exact source sentence.
-3. Verified relation cue phrase and ensured negation cues (e.g., "does not increase") are not misclassified.
-4. Verified chunk ID resolves and follows canonical format.
+## Audit status
+
+The 50-row sample is labeled against its source passage:
+
+- Correct: 16 triples
+- Incorrect: 34 triples
+- Overall precision: 32%
+- Per-relation precision: `interacts_with` = 32% (16/50)
+
+The low precision is attributable mainly to the broad extraction fallback treating
+class names, symptoms, generic nouns, and duplicate drug-name variants as interaction
+entities. These rows should not be presented as direct, clinically specific edges.
+
+## Commands
+
+```powershell
+python -m src.kg.build_kg
+python -m src.kg.kg_filter
+python -m src.kg.show_sample
+python -m src.kg.audit_precision
+```
 
 ## Results
-- **Correct**: TBD / 50
-- **Incorrect**: TBD / 50
-- **Per-Relation Precision**:
-  - `contraindicated_with`: TBD
-  - `increases_effect_of`: TBD
-  - `decreases_effect_of`: TBD
-  - `interacts_with`: TBD
 
-## Disagreements & Observations
-- *None recorded yet (pending Ganavi's published audit sample).*
+- **Correct**: 16
+- **Incorrect**: 34
+- **Per-relation precision**: `interacts_with` = 32%
+- **Overall precision**: 32%
 
-## Required Fixes
-- *TBD*
+## Remaining work
 
-## Disposition
-- **Status**: PENDING REVIEW (Awaiting sample from Ganavi)
-- **Date**: 2026-11-01
+The finalized held-out names and aliases are recorded in
+`docs/heldout_drugs.txt` and `docs/heldout_drug_aliases.txt`.
